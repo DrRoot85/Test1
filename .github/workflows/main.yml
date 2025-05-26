@@ -1,0 +1,51 @@
+name: Build S23 Ultra Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y git wget unzip build-essential
+
+    - name: Clone kernel source with submodules
+      run: |
+        git clone --recursive https://github.com/samsung-sm8550/kernel_samsung_sm8550-common.git \
+          -b ksunext-susfs/android13-5.15 --depth=1
+
+    - name: Patch setup.sh
+      run: |
+        cd kernel_samsung_sm8550-common
+        sed -i 's/next-susfs/next-susfs-dev/' kernelsu-next/kernel/setup.sh
+
+    - name: Download and run link.sh
+      run: |
+        cd kernel_samsung_sm8550-common
+        wget https://raw.githubusercontent.com/DrRoot85/sukisupatch/refs/heads/main/build_ksu.sh  # Replace with actual link
+        chmod +x build_ksu.sh
+        ./build_ksu.sh
+
+    - name: Find and expose zip filename
+      run: |
+        cd kernel_samsung_sm8550-common
+        ZIP_FILE=$(find . -name '*.zip' | head -n 1)
+        echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+
+    - name: Upload ZIP as GitHub Actions artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: s23ultra-kernel
+        path: ${{ env.ZIP_FILE }}
+
+    - name: Create GitHub Release and upload ZIP
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: s23ultra-${{ github.run_number }}
+        files: ${{ env.ZIP_FILE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
