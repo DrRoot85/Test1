@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CCACHE_DIR: ${{ runner.workspace }}/ccache
-      CCACHE_MAXSIZE: 5G
+      CCACHE_MAXSIZE: 16G
       CCACHE_SLOPPINESS: file_macro,time_macros
 
     steps:
@@ -45,7 +45,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: kernel_samsung_sm8550-common/clang
-        key: clang-${{ runner.os }}-${{ github.run_id }}
+        # key: clang-${{ runner.os }}-${{ github.run_id }}
         
     - name: Clone kernel source with submodules
       run: |
