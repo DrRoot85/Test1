@@ -28,7 +28,7 @@ jobs:
         cd kernel_samsung_sm8550-common
         sed -i 's/next-susfs/next-susfs-dev/' KernelSU-Next/kernel/setup.sh
 
-    - name: Download and run link.sh
+    - name: Download and run build script
       run: |
         cd kernel_samsung_sm8550-common
         wget https://raw.githubusercontent.com/DrRoot85/sukisupatch/refs/heads/main/build_ksu.sh  # Replace with actual link
