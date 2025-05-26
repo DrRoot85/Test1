@@ -47,10 +47,27 @@ jobs:
         name: s23ultra-kernel
         path: ${{ env.ZIP_FILE }}
 
+
     - name: Create GitHub Release and upload ZIP
       uses: softprops/action-gh-release@v1
       with:
         tag_name: s23ultra-${{ github.run_number }}
+        name: S23 Series With KernelSU-Next & SUSFS v1.5.7
+        body: |
+          This release contains KernelSU-Next & SUSFS v1.5.7 & Magic Mount
+
+          **KernelSU Next Last Dev Branch**
+
+          Module:
+          https://github.com/sidex15/ksu_module_susfs
+
+          Non-Official Managers:
+          https://github.com/KernelSU-Next/KernelSU-Next
+
+          Features:
+          [+] KernelSU-Next - Latest Dev Branch
+          [+] SUSFS v1.5.7
+          [+] Magic Mount Support
         files: ${{ env.ZIP_FILE }}
       env:
         GITHUB_TOKEN: ${{ secrets.PAT }}
