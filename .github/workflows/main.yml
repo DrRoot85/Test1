@@ -45,7 +45,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: kernel_samsung_sm8550-common/clang
-        # key: clang-${{ runner.os }}-${{ github.run_id }}
+        key: clang-${{ runner.os }}-${{ github.run_id }}
         
     - name: Clone kernel source with submodules
       run: |
