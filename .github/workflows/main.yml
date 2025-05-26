@@ -6,6 +6,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      CCACHE_DIR: ${{ runner.workspace }}/ccache
+      CCACHE_MAXSIZE: 5G
+      CCACHE_SLOPPINESS: file_macro,time_macros
 
     steps:
     - name: Cache apt packages
@@ -16,14 +20,26 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-apt-cache
 
-    - name: Install dependencies
+    - name: Install dependencies including ccache
       run: |
         sudo apt update
-        sudo apt install -y git wget unzip build-essential device-tree-compiler lz4 xz-utils zlib1g-dev openjdk-17-jdk \
+        sudo apt install -y git wget ccache unzip build-essential device-tree-compiler lz4 xz-utils zlib1g-dev openjdk-17-jdk \
           gcc g++ python3 python-is-python3 p7zip-full android-sdk-libsparse-utils erofs-utils default-jdk gnupg flex \
           bison gperf zip curl libc6-dev libncurses-dev libx11-dev libreadline-dev libgl1 libgl1-mesa-dev python3-markdown \
           libxml2-utils xsltproc make repo cpio kmod openssl libelf-dev pahole libssl-dev libarchive-tools zstd --fix-missing && \
           wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb
+
+    - name: Setup ccache
+      run: |
+        echo "/usr/lib/ccache" >> $GITHUB_PATH
+        sudo ln -s /usr/bin/ccache /usr/local/bin/gcc
+        sudo ln -s /usr/bin/ccache /usr/local/bin/g++
+        sudo ln -s /usr/bin/ccache /usr/local/bin/clang
+        sudo ln -s /usr/bin/ccache /usr/local/bin/clang++
+        
+    - name: Show ccache stats before build
+      run: ccache -s
+      
 
     - name: Cache Clang toolchain
       uses: actions/cache@v4
@@ -62,6 +78,8 @@ jobs:
         name: s23ultra-kernel
         path: ${{ env.ZIP_FILE }}
 
+    - name: Show ccache stats after build
+      run: ccache -s
 
     - name: Create GitHub Release and upload ZIP
       uses: softprops/action-gh-release@v1
